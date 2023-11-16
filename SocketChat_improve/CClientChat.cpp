@@ -199,17 +199,17 @@ void CClientChat::OnBnClickedClientMsgButton()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
 	// 데이터 통신에 사용할 변수
-	char buf[BUFSIZE];
+	char buf[BUFSIZE+1];
 	int len;
 
 	// 서버와 데이터 통신
 	CString msg = m_clientMsg;
 	CStringA strAnsi(msg); // 유니코드 CString을 ANSI 문자열로 변환
-	len = strAnsi.GetLength();
+	len = strAnsi.GetLength() + 1;
 
 	// 버퍼 크기를 확인하고 널 종료 문자를 포함하여 복사
-	strncpy_s(buf, BUFSIZE, strAnsi, len);
-
+	strncpy_s(buf+1, BUFSIZE, strAnsi, len);
+	buf[0] = 1;
 	// 데이터 보내기(고정 길이)
 	int retval = send(m_sock, (char*)&len, sizeof(int), 0);
 	// 데이터 보내기(가변 길이)

@@ -252,7 +252,7 @@ void CServerChat::OnBnClickedServerSendButton()
 	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
 	UpdateData(TRUE);
 	// 데이터 통신에 사용할 변수
-	char buf[BUFSIZE];
+	char buf[BUFSIZE+1];
 	int len;
 
 	// 서버와 데이터 통신
