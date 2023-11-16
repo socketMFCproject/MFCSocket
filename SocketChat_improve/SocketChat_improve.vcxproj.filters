@@ -42,6 +42,9 @@
     <ClInclude Include="CClientChat.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="Dol_Check.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SocketChat_improve.cpp">

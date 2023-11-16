@@ -34,6 +34,12 @@ public:
 	CString m_serverMsg;
 	CButton m_sendButton;
 	afx_msg void OnBnClickedServerSendButton();
+	afx_msg void OnSendPosition(int x, int y);
+	afx_msg void SavePosition(int x, int y);
+	//헤더로 뺄 것들
+	afx_msg bool CheckFive(int x, int y, int dx, int dy);
+	afx_msg bool CheckWin(int x, int y);
+	//헤더로 뺄 것들
 	afx_msg void OnPaint();
 	afx_msg LRESULT OnUpdateServerChat(WPARAM wParam, LPARAM lParam);
 	

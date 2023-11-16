@@ -12,7 +12,7 @@ public:
 	CClientChat(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CClientChat();
 private:
-	int m_dol_state = 0; //0 : black(server), 1 : white(client)
+	int m_dol_state = 1; //0 : black(server), 1 : white(client)
 	char m_dol[13][13];	//바둑돌 위치를 기억하기 위한 배열
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
@@ -31,6 +31,11 @@ public:
 	afx_msg void OnBnClickedClientMsgButton();
 	afx_msg void OnBnClickedEndButton();
 	afx_msg void OnPaint();
+	afx_msg void OnSendPosition(int x, int y);
+	afx_msg void SavePosition(int x, int y);
+	//헤더로 뺄 것들
+	afx_msg bool CheckWin(int x, int y);
+	afx_msg bool CheckFive(int x, int y, int dx, int dy);
 	afx_msg LRESULT OnUpdateListbox(WPARAM wParam, LPARAM lParam);
 	//afx_msg static void receiveMessages(CClientChat* pDialog);
 //	CListBox m_chatList;

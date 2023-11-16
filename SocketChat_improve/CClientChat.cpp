@@ -6,6 +6,7 @@
 #include "SocketChat_improve.h"
 #include "afxdialogex.h"
 #include "CClientChat.h"
+//#include "Dol_Check.h"
 //#include "Common.h"
 #include <thread>
 
@@ -124,9 +125,23 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 		if (retval <= 0) break;
 
 		buf[retval] = '\0';
+		if (buf[0] == 1) {
+			// PostMessage를 사용하여 메시지를 UI 스레드로 전달
+			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(buf));
+		}
+		else if (buf[0] == 2) {
+			int x = buf[1];
+			int y = buf[2];
 
-		// PostMessage를 사용하여 메시지를 UI 스레드로 전달
-		pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(buf));
+
+			//TODO: 이 x y 좌표로 그리기
+			CString test;
+			test.Format(_T("x : %d, y : %d"), x, y);
+			pThis->PostMessageW(M_RECV_UPDATE, 0, (LPARAM)new CString(test));
+		}
+		
+		
+		
 
 	}
 
@@ -215,6 +230,82 @@ void CClientChat::OnBnClickedEndButton()
 	WSACleanup();
 }
 
+void CClientChat::OnSendPosition(int x, int y) {
+	// TODO: 여기에 컨트롤 알림 처리기 코드를 추가합니다.
+	UpdateData(TRUE);
+	// 데이터 통신에 사용할 변수
+	char buf[BUFSIZE];
+	int len = 4;
+
+
+	// 버퍼 크기를 확인하고 널 종료 문자를 포함하여 복사
+	buf[0] = 2;
+	buf[1] = x;
+	buf[2] = y;
+
+	SOCKET clientSocket = m_sock;
+
+	// 데이터 보내기(고정 길이)
+	int retval = send(clientSocket, (char*)&len, sizeof(int), 0);
+	// 데이터 보내기(가변 길이)
+	retval = send(clientSocket, buf, len, 0);
+}
+void CClientChat::SavePosition(int x, int y) {
+	m_dol[y - 1][x - 1] = m_dol_state + 1;
+
+	if (CheckWin(x - 1, y - 1)) {
+		// 게임 이겼을 경우
+		//일단 이기면 좌표 창에 우승자 표시
+		CString winString;
+		winString = _T("Winner is ");
+		m_orderList.AddString(winString + (!m_dol_state ? "black" : "white"));
+	}
+	return;
+}
+
+//헤더로 뺄것들
+bool CClientChat::CheckFive(int x, int y, int dx, int dy) {
+	int count = 0;
+	int dx_ = dx;
+	int dy_ = dy;
+	bool che = false;
+	for (int i = 0; i < 5; ++i) {
+		int newX = x + i * dx_;
+		int newY = y + i * dy_;
+		if (newX < 0 || newX >= 14 || newY < 0 || newY >= 14)
+			break;
+		if (m_dol[newY][newX] != m_dol_state + 1)
+			break;
+		count += 1;
+	}
+	if (count >= 5) {
+		return true;
+	}
+	dx_ *= -1;
+	dy_ *= -1;
+	for (int i = 1; i < 5; ++i) {
+		int newX = x + i * dx_;
+		int newY = y + i * dy_;
+		if (newX < 0 || newX >= 14 || newY < 0 || newY >= 14)
+			return false;
+		if (m_dol[newY][newX] != m_dol_state + 1)
+			return false;
+		count += 1;
+		if (count >= 5) {
+			return true;
+		}
+	}
+	return false;
+}
+bool CClientChat::CheckWin(int x, int y) {
+	if (CheckFive(x, y, 1, 0) //가로
+		|| CheckFive(x, y, 0, 1) //세로
+		|| CheckFive(x, y, 1, 1) //대각선 
+		|| CheckFive(x, y, 1, -1))//대각선
+		return true;
+	return false;
+}
+//헤더로 뺄 것들
 
 void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -224,30 +315,36 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 	int x = (point.x + 20) / 40;
 	int y = (point.y + 20) / 40;
 	if (m_dol[y - 1][x - 1] > 0) return;    //중복 체크 
-	m_dol[y - 1][x - 1] = m_dol_state + 1;        //바둑판 위치 저장
+	SavePosition(x, y);
+	OnSendPosition(x, y);
+	
+
 	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
 		x *= 40;
 		y *= 40;
 
 		CBrush* p_old_brush;
-		if (m_dol_state == 0)
+		/*if (m_dol_state == 0)
 		{
 			p_old_brush = (CBrush*)dc.SelectStockObject(BLACK_BRUSH);
 		}
 		else
 		{
 			p_old_brush = (CBrush*)dc.SelectStockObject(WHITE_BRUSH);
-		}
-
+		}*/
+		
+		// client는 백돌
+		p_old_brush = (CBrush*)dc.SelectStockObject(WHITE_BRUSH);
+		
 		dc.Ellipse(x - 20, y - 20, x + 20, y + 20);
 		dc.SelectObject(p_old_brush);
-		m_dol_state = !m_dol_state;
+		
 
 		CString str_x, str_y;
 		str_x.Format(_T("%d"), x / 40);
 		str_y.Format(_T("%d"), y / 40);
 
-		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + (!m_dol_state ? "white" : "black"));
+		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + "white");
 
 	}
 	CDialogEx::OnLButtonDown(nFlags, point);
