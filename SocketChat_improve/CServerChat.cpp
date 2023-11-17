@@ -16,6 +16,11 @@
 #define M_SERVER_RECV_UPDATE (WM_USER + 10) // 서버에서 사용할 사용자 정의 메시지
 // CServerChat 대화 상자
 
+//HANDLE hServerEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+HANDLE hClientEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+bool isServerTurn = FALSE;
+
 IMPLEMENT_DYNAMIC(CServerChat, CDialogEx)
 
 CServerChat::CServerChat(CWnd* pParent /*=nullptr*/)
@@ -27,7 +32,7 @@ CServerChat::CServerChat(CWnd* pParent /*=nullptr*/)
 
 CServerChat::~CServerChat()
 {
-	closesocket(m_listenSocket);
+	
 	WSACleanup();
 }
 
@@ -145,6 +150,10 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 
 			}
 			else if (buf[0] == 2) {
+
+				//SetEvent(hClientEvent);
+				isServerTurn = TRUE;
+
 				//오목 x y 좌표
 				int x = buf[1];
 				int y = buf[2];
@@ -152,6 +161,7 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 				CString str;
 				str.Format(_T("x : %d y: %d"), x, y);
 				pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+
 			}
 
 		
@@ -163,49 +173,6 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 
     }
     return 0;
-}
-
-void CServerChat::ListInput() {
-	AfxMessageBox(_T("여기 실행되나?"));
-	m_chatList.AddString(_T("please"));
-}
-
-UINT CServerChat::ClientThread(LPVOID pParam)
-{
-	CServerChat* pThis = reinterpret_cast<CServerChat*>(pParam);
-	SOCKET clientSocket = (SOCKET)pParam;
-	CClientDC dc();
-	char buf[BUFSIZE];
-	int len;
-	pThis->ListInput();
-	while (true)
-	{
-		int retval = recv(clientSocket, (char*)&len, sizeof(int), 0);
-		if (retval <= 0) break;
-		if (len >= BUFSIZE) break;
-
-		retval = recv(clientSocket, buf, len, 0);
-		if (retval <= 0) break;
-		
-		buf[retval] = '\0';
-		
-		//채팅 메시지
-		// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
-		CString str(buf);
-		AfxMessageBox(_T("클라이언트로 부터 메시지 받기4"));
-		// 메시지를 UI 스레드로 전달
-		//pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
-		pThis->ListInput();
-		AfxMessageBox(_T("클라이언트로 부터 메시지 받기5"));
-		
-		
-		
-		
-	}
-
-	// 소켓 닫기s
-	closesocket(clientSocket);
-	return 0;
 }
 
 void CServerChat::recivePoint(int x, int y, LPVOID pParam) {
@@ -255,14 +222,11 @@ BOOL CServerChat::OnInitDialog()
 	retval = listen(m_listenSocket, SOMAXCONN);
 	//if (retval == SOCKET_ERROR) err_quit("listen()");
 
-	// TODO test해보자.
-
-
-	//SOCKET clientSocket = accept(listenSocket, (sockaddr*)&clientaddr, &addrlen);
-
 	AfxBeginThread(AcceptThread, this);
-	
 
+	//SetEvent(hClientEvent);
+	isServerTurn = TRUE;
+	
 	return TRUE;  // return TRUE unless you set the focus to a control
 	// 예외: OCX 속성 페이지는 FALSE를 반환해야 합니다.
 }
@@ -377,6 +341,10 @@ bool CServerChat::CheckWin(int x, int y) {
 
 void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (isServerTurn == FALSE) return;
+	//WaitForSingleObject(hClientEvent, INFINITE);
+	
+
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CClientDC dc(this);
 	
@@ -415,5 +383,51 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + "black");
 
 	}
+	isServerTurn = FALSE;
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
+
+
+
+//UINT CServerChat::ClientThread(LPVOID pParam)
+//{
+//	CServerChat* pThis = reinterpret_cast<CServerChat*>(pParam);
+//	SOCKET clientSocket = (SOCKET)pParam;
+//	CClientDC dc();
+//	char buf[BUFSIZE];
+//	int len;
+//	pThis->ListInput();
+//	while (true)
+//	{
+//		int retval = recv(clientSocket, (char*)&len, sizeof(int), 0);
+//		if (retval <= 0) break;
+//		if (len >= BUFSIZE) break;
+//
+//		retval = recv(clientSocket, buf, len, 0);
+//		if (retval <= 0) break;
+//		
+//		buf[retval] = '\0';
+//		
+//		//채팅 메시지
+//		// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
+//		CString str(buf);
+//		AfxMessageBox(_T("클라이언트로 부터 메시지 받기4"));
+//		// 메시지를 UI 스레드로 전달
+//		//pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+//		pThis->ListInput();
+//		AfxMessageBox(_T("클라이언트로 부터 메시지 받기5"));
+//		
+//		
+//		
+//		
+//	}
+//
+//	// 소켓 닫기s
+//	closesocket(clientSocket);
+//	return 0;
+//}
+
+//void CServerChat::ListInput() {
+//	AfxMessageBox(_T("여기 실행되나?"));
+//	m_chatList.AddString(_T("please"));
+//}

@@ -17,6 +17,10 @@ char* SERVERIP = (char*)"127.0.0.1";
 
 #define M_RECV_UPDATE (WM_USER + 1) // 사용자 정의 메시지
 
+HANDLE hServerEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+//HANDLE hClientEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+bool isClientTurn = FALSE;
+
 // CClientChat 대화 상자
 
 IMPLEMENT_DYNAMIC(CClientChat, CDialogEx)
@@ -131,6 +135,9 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(str));
 		}
 		else if (buf[0] == 2) {
+			//SetEvent(hServerEvent);
+			isClientTurn = TRUE;
+
 			int x = buf[1];
 			int y = buf[2];
 
@@ -201,8 +208,7 @@ BOOL CClientChat::OnInitDialog()
 	retval = connect(m_sock, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) { AfxMessageBox(_T("connect 오류")); }
 	AfxMessageBox(_T("서버 연결 성공"));
-	//m_receiveThread = std::thread(&CClientChat::receiveMessages, this);
-	//m_receiveThread.detach();
+	
 	AfxBeginThread(ClientOwnThread, this);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -325,6 +331,9 @@ bool CClientChat::CheckWin(int x, int y) {
 
 void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	if (isClientTurn == FALSE) return;
+	//WaitForSingleObject(hServerEvent, INFINITE);
+
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	CClientDC dc(this);
 
@@ -363,6 +372,9 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + "white");
 
 	}
+
+	isClientTurn = FALSE;
+
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
