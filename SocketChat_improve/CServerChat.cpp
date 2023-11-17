@@ -136,11 +136,24 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 
 			buf[retval] = '\0';
 
+			if (buf[0] == 1) {
 			// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
-			CString str(buf);
+			CString str(buf + 1);
 			
 			// 메시지를 UI 스레드로 전달
 			pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+
+			}
+			else if (buf[0] == 2) {
+				//오목 x y 좌표
+				int x = buf[1];
+				int y = buf[2];
+				pThis->recivePoint(x, y, pParam);
+				CString str;
+				str.Format(_T("x : %d y: %d"), x, y);
+				pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+			}
+
 		
 			
 		}
@@ -176,28 +189,16 @@ UINT CServerChat::ClientThread(LPVOID pParam)
 		
 		buf[retval] = '\0';
 		
-		if (buf[0] == 1) {
-			//채팅 메시지
-			// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
-			CString str(buf);
-			AfxMessageBox(_T("클라이언트로 부터 메시지 받기4"));
-			// 메시지를 UI 스레드로 전달
-			//pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
-			pThis->ListInput();
-			AfxMessageBox(_T("클라이언트로 부터 메시지 받기5"));
-		}
-		else if (buf[0] == 2) {
-			//오목 x y 좌표
-			int x = buf[1];
-			int y = buf[2];
-
-			pThis -> recivePoint(x, y, pParam);
-
-			//TODO: 이 x y 좌표로 그리기
-			CString test;
-			test.Format(_T("x : %d, y : %d"), x, y);
-			AfxMessageBox(_T("client에서 좌표 보냄"));
-		}
+		//채팅 메시지
+		// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
+		CString str(buf);
+		AfxMessageBox(_T("클라이언트로 부터 메시지 받기4"));
+		// 메시지를 UI 스레드로 전달
+		//pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+		pThis->ListInput();
+		AfxMessageBox(_T("클라이언트로 부터 메시지 받기5"));
+		
+		
 		
 		
 	}

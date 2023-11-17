@@ -127,7 +127,8 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 		buf[retval] = '\0';
 		if (buf[0] == 1) {
 			// PostMessage를 사용하여 메시지를 UI 스레드로 전달
-			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(buf));
+			CString str(buf + 1);
+			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(str));
 		}
 		else if (buf[0] == 2) {
 			int x = buf[1];
@@ -259,12 +260,11 @@ void CClientChat::OnSendPosition(int x, int y) {
 	buf[1] = x;
 	buf[2] = y;
 
-	SOCKET clientSocket = m_sock;
 
 	// 데이터 보내기(고정 길이)
-	int retval = send(clientSocket, (char*)&len, sizeof(int), 0);
+	int retval = send(m_sock, (char*)&len, sizeof(int), 0);
 	// 데이터 보내기(가변 길이)
-	retval = send(clientSocket, buf, len, 0);
+	retval = send(m_sock, buf, len, 0);
 }
 void CClientChat::SavePosition(int x, int y) {
 	m_dol[y - 1][x - 1] = m_dol_state + 1;
