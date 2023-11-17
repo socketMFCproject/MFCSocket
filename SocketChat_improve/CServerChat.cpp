@@ -352,10 +352,13 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 	int y = (point.y + 20) / 40;
 
 	if (m_dol[y - 1][x - 1] > 0) return;    //중복 체크 
-	SavePosition(x, y);
-
-	OnSendPosition(x, y);
+	
 	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
+
+		SavePosition(x, y);
+
+		OnSendPosition(x, y);
+
 		x *= 40;
 		y *= 40;
 
@@ -381,9 +384,9 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 		str_y.Format(_T("%d"), y / 40);
 
 		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + "black");
-
+		isServerTurn = FALSE;
 	}
-	isServerTurn = FALSE;
+	
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
