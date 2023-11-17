@@ -1,9 +1,3 @@
-﻿  pch.cpp
-  CClientChat.cpp
-C:\Users\rlawo\Desktop\SocketChat_improve\CClientChat.cpp(172,44): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
-  CServerChat.cpp
-C:\Users\rlawo\Desktop\SocketChat_improve\CServerChat.cpp(218,44): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
-  SocketChat_improve.cpp
-  SocketChat_improveDlg.cpp
-  코드를 생성하고 있습니다...
-  SocketChat_improve.vcxproj -> C:\Users\rlawo\Desktop\SocketChat_improve\x64\Debug\SocketChat_improve.exe
+﻿  CClientChat.cpp
+C:\Users\kyb12\Desktop\3-2학기\network\MFCSocket\SocketChat_improve\CClientChat.cpp(188,44): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+  SocketChat_improve.vcxproj -> C:\Users\kyb12\Desktop\3-2학기\network\MFCSocket\SocketChat_improve\x64\Debug\SocketChat_improve.exe

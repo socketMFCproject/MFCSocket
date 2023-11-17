@@ -2,3 +2,4 @@ C:\Users\rlawo\Desktop\SocketChat_improve\x64\Debug\SocketChat_improve.exe
 C:\Users\rlawo\Desktop\snsgit\MFCSocketChat\SocketChat_improve\x64\Debug\SocketChat_improve.exe
 C:\Users\kyb12\Desktop\3-2학기\network\MFCSocketChat\SocketChat_improve\x64\Debug\SocketChat_improve.exe
 C:\Users\dup06\Desktop\스마트 네트워크 서비스\프로젝트\SocketChat_improve\x64\Debug\SocketChat_improve.exe
+C:\Users\kyb12\Desktop\3-2학기\network\MFCSocket\SocketChat_improve\x64\Debug\SocketChat_improve.exe

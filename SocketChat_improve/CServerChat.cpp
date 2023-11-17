@@ -161,6 +161,7 @@ UINT CServerChat::ClientThread(LPVOID pParam)
 {
 	CServerChat* pThis = reinterpret_cast<CServerChat*>(pParam);
 	SOCKET clientSocket = (SOCKET)pParam;
+	CClientDC dc();
 	char buf[BUFSIZE];
 	int len;
 	pThis->ListInput();
@@ -190,6 +191,7 @@ UINT CServerChat::ClientThread(LPVOID pParam)
 			int x = buf[1];
 			int y = buf[2];
 
+			pThis -> recivePoint(x, y, pParam);
 
 			//TODO: 이 x y 좌표로 그리기
 			CString test;
@@ -205,6 +207,24 @@ UINT CServerChat::ClientThread(LPVOID pParam)
 	return 0;
 }
 
+void CServerChat::recivePoint(int x, int y, LPVOID pParam) {
+	CServerChat* pThis = reinterpret_cast<CServerChat*>(pParam);
+	CClientDC dc(this);
+	pThis->m_dol[y - 1][x - 1] = (pThis->m_dol_state == 1 ? 0 : 1) + 1;
+	printf("%d %d", x, y);
+	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
+		x *= 40;
+		y *= 40;
+
+		CBrush* p_old_brush;
+		//client 백돌 수신
+		p_old_brush = (CBrush*)dc.SelectStockObject(WHITE_BRUSH);
+
+		dc.Ellipse(x - 20, y - 20, x + 20, y + 20);
+		dc.SelectObject(p_old_brush);
+
+	}
+}
 
 
 BOOL CServerChat::OnInitDialog()
@@ -299,10 +319,8 @@ void CServerChat::OnSendPosition(int x, int y) {
 
 
 
-
 void CServerChat::SavePosition(int x, int y) {
 	m_dol[y - 1][x - 1] = m_dol_state + 1;
-	
 	if (CheckWin(x - 1, y - 1)) {
 		// 게임 이겼을 경우
 		//일단 이기면 좌표 창에 우승자 표시

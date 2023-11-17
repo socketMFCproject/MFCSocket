@@ -36,6 +36,7 @@ public:
 	//헤더로 뺄 것들
 	afx_msg bool CheckWin(int x, int y);
 	afx_msg bool CheckFive(int x, int y, int dx, int dy);
+	afx_msg void recivePoint(int x, int y, LPVOID aParam);
 	afx_msg LRESULT OnUpdateListbox(WPARAM wParam, LPARAM lParam);
 	//afx_msg static void receiveMessages(CClientChat* pDialog);
 //	CListBox m_chatList;

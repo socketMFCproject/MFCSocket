@@ -133,22 +133,38 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 			int x = buf[1];
 			int y = buf[2];
 
+			pThis->recivePoint(x, y, aParam);
 
 			//TODO: 이 x y 좌표로 그리기
 			CString test;
 			test.Format(_T("x : %d, y : %d"), x, y);
 			pThis->PostMessageW(M_RECV_UPDATE, 0, (LPARAM)new CString(test));
 		}
-		
-		
-		
-
 	}
 
 	// 소켓 닫기
 	closesocket(pThis->m_sock);
 	pThis->m_sock = INVALID_SOCKET;
 	return 0;
+}
+
+void CClientChat::recivePoint(int x, int y, LPVOID aParam) {
+	CClientChat* pThis = reinterpret_cast<CClientChat*>(aParam);
+	CClientDC dc(this);
+	pThis->m_dol[y - 1][x - 1] = (pThis->m_dol_state == 1 ? 0 : 1) + 1;
+	printf("%d %d", x, y);
+	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
+		x *= 40;
+		y *= 40;
+		
+		CBrush* p_old_brush;
+		//client blck돌 수신
+		p_old_brush = (CBrush*)dc.SelectStockObject(BLACK_BRUSH);
+
+		dc.Ellipse(x - 20, y - 20, x + 20, y + 20);
+		dc.SelectObject(p_old_brush);
+
+	}
 }
 
 
@@ -349,3 +365,4 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 	}
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
+
