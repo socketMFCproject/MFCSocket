@@ -72,6 +72,9 @@ void CClientChat::OnPaint()
 	else
 	{
 		CPaintDC dc(this);//여기서만 CClientDC사용, Flag성변수를 1->0으로만드는 기능 포함되어있음
+		CBrush brownBrush(RGB(236, 187, 90)); // 갈색 브러시 생성
+		dc.SelectObject(&brownBrush); // 갈색 브러시 선택
+		dc.Rectangle(cell_size - 10, cell_size - 10, cell_size * 13 + 10, cell_size * 13 + 10);
 
 		for (int y = 0; y < 12; y++)
 		{
@@ -82,6 +85,25 @@ void CClientChat::OnPaint()
 			}
 		}
 
+		int radius = 5;
+		CPen blackPen(PS_SOLID, 1, RGB(0, 0, 0)); // 검은색 펜 생성
+		CPen* oldPen = dc.SelectObject(&blackPen); // 현재 펜 저장
+		for (int y = 0; y <= 12; y++)
+		{
+			for (int x = 0; x <= 12; x++)
+			{
+				if (y % 3 == 0 && x % 3 == 0) {
+					CBrush blackBrush(RGB(0, 0, 0)); // 검은색 브러시 생성
+					CBrush* oldBrush = dc.SelectObject(&blackBrush); // 현재 브러시 저장
+
+					dc.Ellipse(cell_size + x * cell_size - radius, cell_size + y * cell_size - radius, cell_size + x * cell_size + radius, cell_size + y * cell_size + radius);
+
+					dc.SelectObject(oldBrush); // 이전 브러시로 복원
+				}
+			}
+		}
+
+		dc.SelectObject(oldPen); // 이전 펜으로 복원
 		CBrush* p_old_brush = (CBrush*)dc.SelectStockObject(BLACK_BRUSH);
 		for (int y = 1; y <= 13; y++)//저장된 바둑돌 재생성
 		{
