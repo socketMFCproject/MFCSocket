@@ -50,9 +50,9 @@ public:
 	std::mutex m_csClientSockets; // 클라이언트 소켓 벡터를 보호할 뮤텍스
 
 	static UINT AcceptThread(LPVOID pParam); // 클라이언트 연결 수락 스레드
-	static UINT ClientThread(LPVOID pParam); // 클라이언트 통신 스레드
+	//static UINT ClientThread(LPVOID pParam); // 클라이언트 통신 스레드
 
-	afx_msg void ListInput(CString str);
-	afx_msg void ListInput();
+	//afx_msg void ListInput(CString str);
+	//afx_msg void ListInput();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 };

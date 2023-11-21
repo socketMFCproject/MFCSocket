@@ -32,7 +32,14 @@ CServerChat::CServerChat(CWnd* pParent /*=nullptr*/)
 
 CServerChat::~CServerChat()
 {
-	
+	// 모든 클라이언트 소켓을 닫습니다.
+	for (auto socket : m_clientSockets)
+	{
+		shutdown(socket, SD_BOTH); // 더 이상의 송수신 비활성화
+		closesocket(socket);
+	}
+
+	// 윈속 정리
 	WSACleanup();
 }
 
@@ -147,7 +154,7 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
         if (clientSocket == INVALID_SOCKET) continue;
 		AfxMessageBox(_T("클라이언트 연결 성공"));
 
-        std::lock_guard<std::mutex> lock(pThis->m_csClientSockets);
+        //std::lock_guard<std::mutex> lock(pThis->m_csClientSockets);
         pThis->m_clientSockets.push_back(clientSocket);
 		
         //AfxBeginThread(ClientThread, (LPVOID)clientSocket);
