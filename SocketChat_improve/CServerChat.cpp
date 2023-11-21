@@ -8,6 +8,7 @@
 //#include "Common.h"
 //#include "Dol_Check.h"
 #include <thread>
+#include "CGameover.h"
 
 #define SERVERPORT 9000
 #define BUFSIZE    512
@@ -322,6 +323,13 @@ void CServerChat::SavePosition(int x, int y) {
 		CString winString;
 		winString = _T("Winner is ");
 		m_orderList.AddString(winString +(!m_dol_state ? "black" : "white"));
+
+		
+		//게임 종료 화면 띄우기
+		CGameover gameover;
+		gameover.SetWinner(!m_dol_state ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
+		gameover.DoModal();
+
 	}
 	return;
 }
