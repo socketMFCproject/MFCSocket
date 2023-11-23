@@ -18,6 +18,8 @@ public:
 private:
 	int m_dol_state = 0; //0 : black(server), 1 : white(client)
 	char m_dol[13][13];	//바둑돌 위치를 기억하기 위한 배열
+	int myPortNum;
+	int otherPortNum;
 // 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_SERVER_CHAT_DIALOG };
@@ -37,8 +39,8 @@ public:
 	afx_msg void OnSendPosition(int x, int y);
 	afx_msg void SavePosition(int x, int y);
 	//헤더로 뺄 것들
-	afx_msg bool CheckFive(int x, int y, int dx, int dy);
-	afx_msg bool CheckWin(int x, int y);
+	afx_msg bool CheckFive(int x, int y, int dx, int dy, int m_dol_state_);
+	afx_msg bool CheckWin(int x, int y, int m_dol_state_);
 	afx_msg void recivePoint(int x, int y, LPVOID pParam);
 	//헤더로 뺄 것들
 	afx_msg void OnPaint();

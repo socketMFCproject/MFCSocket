@@ -141,6 +141,22 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 	char buf[BUFSIZE];
 	int len;
 
+	//포트 번호 보내기
+	CString portNum;
+	portNum.Format(_T("%d"), pThis->myPortNum);
+	CStringA strAnsi(portNum); // 유니코드 CString을 ANSI 문자열로 변환
+	len = strAnsi.GetLength() + 1;
+
+	// 버퍼 크기를 확인하고 널 종료 문자를 포함하여 복사
+	buf[0] = 3;
+	strncpy_s(buf + 1, BUFSIZE, strAnsi, len);
+
+
+	// 데이터 보내기(고정 길이)
+	int retval = send(pThis->m_sock, (char*)&len, sizeof(int), 0);
+	// 데이터 보내기(가변 길이)
+	retval = send(pThis->m_sock, buf, len, 0);
+
 	while (true)
 	{
 		int retval = recv(pThis->m_sock, (char*)&len, sizeof(int), 0);
@@ -171,6 +187,11 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 			test.Format(_T("x : %d, y : %d"), x, y);
 			pThis->PostMessageW(M_RECV_UPDATE, 0, (LPARAM)new CString(test));
 		}
+		else if (buf[0] == 3) {
+			//상대방 포트 번호 받기
+			CString str(buf + 1);
+			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(str));
+		}
 	}
 
 	// 소켓 닫기
@@ -182,9 +203,12 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 void CClientChat::recivePoint(int x, int y, LPVOID aParam) {
 	CClientChat* pThis = reinterpret_cast<CClientChat*>(aParam);
 	CClientDC dc(this);
-	pThis->m_dol[y - 1][x - 1] = (pThis->m_dol_state == 1 ? 0 : 1) + 1;
+	int m_dol_state_ = (pThis->m_dol_state == 1 ? 0 : 1);
+	pThis->m_dol[y - 1][x - 1] =  m_dol_state_+ 1;
 	printf("%d %d", x, y);
 	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
+		int rx_ = x;
+		int ry_ = y;
 		x *= 40;
 		y *= 40;
 		
@@ -194,6 +218,18 @@ void CClientChat::recivePoint(int x, int y, LPVOID aParam) {
 
 		dc.Ellipse(x - 20, y - 20, x + 20, y + 20);
 		dc.SelectObject(p_old_brush);
+		if (CheckWin(rx_ - 1, ry_ - 1, m_dol_state_)) {
+			// 게임 이겼을 경우
+			//일단 이기면 좌표 창에 우승자 표시
+			CString winString;
+			winString = _T("Winner is ");
+			m_orderList.AddString(winString + (!m_dol_state_ ? "black" : "white"));
+
+			//게임 종료 화면 띄우기
+			CGameover gameover;
+			gameover.SetWinner(!m_dol_state_ ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
+			gameover.DoModal();
+		}
 
 	}
 }
@@ -231,7 +267,25 @@ BOOL CClientChat::OnInitDialog()
 	retval = connect(m_sock, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
 	if (retval == SOCKET_ERROR) { AfxMessageBox(_T("connect 오류")); }
 	AfxMessageBox(_T("서버 연결 성공"));
+
+
+	//자신의 포트 번호 알아내기
+	struct sockaddr_in localAddr;
+	int localAddressLength = sizeof(localAddr);
 	
+	if (getsockname(m_sock, (struct sockaddr*)&localAddr, &localAddressLength) == 0) {
+		myPortNum = localAddr.sin_port;
+	}
+	else
+	{
+		// getsockname이 실패한 경우 에러 처리를 추가할 수 있습니다.
+		int errorCode = WSAGetLastError();
+		CString errorMsg;
+		errorMsg.Format(_T("Error getting port number: %d"), errorCode);
+		AfxMessageBox(errorMsg, MB_OK | MB_ICONERROR);
+	}
+
+
 	AfxBeginThread(ClientOwnThread, this);
 
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -295,26 +349,10 @@ void CClientChat::OnSendPosition(int x, int y) {
 	// 데이터 보내기(가변 길이)
 	retval = send(m_sock, buf, len, 0);
 }
-void CClientChat::SavePosition(int x, int y) {
-	m_dol[y - 1][x - 1] = m_dol_state + 1;
 
-	if (CheckWin(x - 1, y - 1)) {
-		// 게임 이겼을 경우
-		//일단 이기면 좌표 창에 우승자 표시
-		CString winString;
-		winString = _T("Winner is ");
-		m_orderList.AddString(winString + (!m_dol_state ? "black" : "white"));
-
-		//게임 종료 화면 띄우기
-		CGameover gameover;
-		gameover.SetWinner(!m_dol_state ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
-		gameover.DoModal();
-	}
-	return;
-}
 
 //헤더로 뺄것들
-bool CClientChat::CheckFive(int x, int y, int dx, int dy) {
+bool CClientChat::CheckFive(int x, int y, int dx, int dy, int m_dol_state_) {
 	int count = 0;
 	int dx_ = dx;
 	int dy_ = dy;
@@ -324,7 +362,7 @@ bool CClientChat::CheckFive(int x, int y, int dx, int dy) {
 		int newY = y + i * dy_;
 		if (newX < 0 || newX >= 14 || newY < 0 || newY >= 14)
 			break;
-		if (m_dol[newY][newX] != m_dol_state + 1)
+		if (m_dol[newY][newX] != m_dol_state_ + 1)
 			break;
 		count += 1;
 	}
@@ -338,7 +376,7 @@ bool CClientChat::CheckFive(int x, int y, int dx, int dy) {
 		int newY = y + i * dy_;
 		if (newX < 0 || newX >= 14 || newY < 0 || newY >= 14)
 			return false;
-		if (m_dol[newY][newX] != m_dol_state + 1)
+		if (m_dol[newY][newX] != m_dol_state_ + 1)
 			return false;
 		count += 1;
 		if (count >= 5) {
@@ -347,11 +385,11 @@ bool CClientChat::CheckFive(int x, int y, int dx, int dy) {
 	}
 	return false;
 }
-bool CClientChat::CheckWin(int x, int y) {
-	if (CheckFive(x, y, 1, 0) //가로
-		|| CheckFive(x, y, 0, 1) //세로
-		|| CheckFive(x, y, 1, 1) //대각선 
-		|| CheckFive(x, y, 1, -1))//대각선
+bool CClientChat::CheckWin(int x, int y, int m_dol_state_) {
+	if (CheckFive(x, y, 1, 0, m_dol_state_) //가로
+		|| CheckFive(x, y, 0, 1, m_dol_state_) //세로
+		|| CheckFive(x, y, 1, 1, m_dol_state_) //대각선 
+		|| CheckFive(x, y, 1, -1, m_dol_state_))//대각선
 		return true;
 	return false;
 }
@@ -371,8 +409,10 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (x > 0 && x <= 13 && y > 0 && y <= 13) {
 
-		SavePosition(x, y);
+		m_dol[y - 1][x - 1] = m_dol_state + 1;
 		OnSendPosition(x, y);
+		int rx_ = x;
+		int ry_ = y;
 		x *= 40;
 		y *= 40;
 
@@ -391,13 +431,23 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 		
 		dc.Ellipse(x - 20, y - 20, x + 20, y + 20);
 		dc.SelectObject(p_old_brush);
-		
+		if (CheckWin(rx_ - 1, ry_ - 1, m_dol_state)) {
+			// 게임 이겼을 경우
+			//일단 이기면 좌표 창에 우승자 표시
+			CString winString;
+			winString = _T("Winner is ");
+			m_orderList.AddString(winString + (!m_dol_state ? "black" : "white"));
 
-		CString str_x, str_y;
-		str_x.Format(_T("%d"), x / 40);
-		str_y.Format(_T("%d"), y / 40);
+			//게임 종료 화면 띄우기
+			CGameover gameover;
+			gameover.SetWinner(!m_dol_state ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
+			gameover.DoModal();
+		}
 
-		m_orderList.AddString(str_x + " y : " + str_y + " turn : " + "white");
+		CString str;
+		str.Format(_T("x : %d y : %d"), x / 40, y / 40);
+
+		m_orderList.AddString(str + " turn : " + "white");
 		isClientTurn = FALSE;
 	}
 
