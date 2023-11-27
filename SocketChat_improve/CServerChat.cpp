@@ -159,7 +159,7 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
         pThis->m_clientSockets.push_back(clientSocket);
 		
         //AfxBeginThread(ClientThread, (LPVOID)clientSocket);
-		char buf[BUFSIZE];
+		char buf[BUFSIZE+1];
 		int len;
 
 		

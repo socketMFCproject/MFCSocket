@@ -138,7 +138,7 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 {
 	CClientChat* pThis = reinterpret_cast<CClientChat*>(aParam);
 
-	char buf[BUFSIZE];
+	char buf[BUFSIZE+1];
 	int len;
 
 	//포트 번호 보내기
@@ -146,7 +146,7 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 	portNum.Format(_T("%d"), pThis->myPortNum);
 	CStringA strAnsi(portNum); // 유니코드 CString을 ANSI 문자열로 변환
 	len = strAnsi.GetLength() + 1;
-
+	
 	// 버퍼 크기를 확인하고 널 종료 문자를 포함하여 복사
 	buf[0] = 3;
 	strncpy_s(buf + 1, BUFSIZE, strAnsi, len);
@@ -347,6 +347,12 @@ void CClientChat::OnSendPosition(int x, int y) {
 	// 데이터 보내기(고정 길이)
 	int retval = send(m_sock, (char*)&len, sizeof(int), 0);
 	// 데이터 보내기(가변 길이)
+	retval = send(m_sock, buf, len, 0);
+}
+
+void CClientChat::OnSendMessage(char buf[], int len, int i) {
+	buf[0] = i;
+	int retval = send(m_sock, (char*)&len, sizeof(int), 0);
 	retval = send(m_sock, buf, len, 0);
 }
 

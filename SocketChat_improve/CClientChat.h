@@ -35,6 +35,7 @@ public:
 	afx_msg void OnPaint();
 	afx_msg void OnSendPosition(int x, int y);
 	afx_msg void SavePosition(int x, int y);
+	afx_msg void OnSendMessage(char buf[], int len, int i);
 	//헤더로 뺄 것들
 	afx_msg bool CheckWin(int x, int y, int m_dol_state_);
 	afx_msg bool CheckFive(int x, int y, int dx, int dy, int m_dol_state_);
