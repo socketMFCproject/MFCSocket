@@ -50,4 +50,5 @@ public:
 //	CListBox m_chatList_client;
 	CListBox m_client_chat_list;
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	CString m_serverPort;
 };

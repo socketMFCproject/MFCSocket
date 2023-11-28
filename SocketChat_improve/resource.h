@@ -28,6 +28,8 @@
 #define IDC_NEWGAME_BUTTON              1012
 #define IDC_BUTTON3                     1014
 #define IDC_GAMEOVER_BUTTON             1014
+#define IDC_CLIENT_PORT                 1015
+#define IDC_SERVER_PORT                 1016
 
 // Next default values for new objects
 // 
@@ -35,7 +37,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        137
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1015
+#define _APS_NEXT_CONTROL_VALUE         1017
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

@@ -57,4 +57,5 @@ public:
 	//afx_msg void ListInput(CString str);
 	//afx_msg void ListInput();
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	CString m_clientPort;
 };

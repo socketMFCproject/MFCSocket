@@ -27,6 +27,7 @@ IMPLEMENT_DYNAMIC(CServerChat, CDialogEx)
 CServerChat::CServerChat(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SERVER_CHAT_DIALOG, pParent)
 	, m_serverMsg(_T(""))
+	, m_clientPort(_T(""))
 {
 
 }
@@ -51,6 +52,7 @@ void CServerChat::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LIST1, m_orderList);
 	DDX_Text(pDX, IDC_SERVER_MSG, m_serverMsg);
 	DDX_Control(pDX, IDC_SERVER_SEND_BUTTON, m_sendButton);
+	DDX_Text(pDX, IDC_CLIENT_PORT, m_clientPort);
 }
 
 
@@ -135,9 +137,27 @@ void CServerChat::OnPaint()
 
 
 LRESULT CServerChat::OnUpdateServerChat(WPARAM wParam, LPARAM lParam) {
-	CString* pStr = reinterpret_cast<CString*>(lParam);
-	m_chatList.AddString(pStr->GetString());
-	delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	if (wParam == 0) {
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		m_chatList.AddString(pStr->GetString());
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
+	else if (wParam == 1) {
+		CFont m_font;
+		m_font.CreatePointFont(100, _T("Arial")); // 16포인트 크기의 Arial 폰트
+		GetDlgItem(IDC_CLIENT_PORT)->SetFont(&m_font); // ID가 IDC_CLIENT_PORT인 컨트롤에 폰트 설정
+
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		CString str;
+		str.Format(_T("상대편 포트번호 : %s"), pStr->GetString());
+
+		m_clientPort.SetString(str);
+
+		UpdateData(FALSE);
+
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
+	
 	return 0;
 }
 
@@ -214,7 +234,8 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 			else if (buf[0] == 3) {
 				//상대방 포트 번호 받기
 				CString str(buf + 1);
-				pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+				pThis->PostMessage(M_SERVER_RECV_UPDATE, 1, (LPARAM)new CString(str));
+				
 			}
 
 		

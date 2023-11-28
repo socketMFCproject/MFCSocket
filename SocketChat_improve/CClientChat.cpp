@@ -29,6 +29,7 @@ IMPLEMENT_DYNAMIC(CClientChat, CDialogEx)
 CClientChat::CClientChat(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG1, pParent)
 	, m_clientMsg(_T(""))
+	, m_serverPort(_T(""))
 {
 
 }
@@ -50,6 +51,7 @@ void CClientChat::DoDataExchange(CDataExchange* pDX)
 	//  DDX_Control(pDX, IDC_Client_LIST, m_chatList_client);
 	DDX_Control(pDX, IDC_LIST2, m_orderList);
 	DDX_Control(pDX, IDC_CLIENT_LIST_TEST, m_client_chat_list);
+	DDX_Text(pDX, IDC_SERVER_PORT, m_serverPort);
 }
 
 
@@ -190,7 +192,7 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 		else if (buf[0] == 3) {
 			//상대방 포트 번호 받기
 			CString str(buf + 1);
-			pThis->PostMessage(M_RECV_UPDATE, 0, (LPARAM)new CString(str));
+			pThis->PostMessage(M_RECV_UPDATE, 1, (LPARAM)new CString(str));
 		}
 	}
 
@@ -236,10 +238,26 @@ void CClientChat::recivePoint(int x, int y, LPVOID aParam) {
 
 
 LRESULT CClientChat::OnUpdateListbox(WPARAM wParam, LPARAM lParam) {
+	if (wParam == 0) {
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		m_client_chat_list.AddString(pStr->GetString());
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
+	else if (wParam == 1) {
+		CFont m_font;
+		m_font.CreatePointFont(110, _T("Arial")); // 16포인트 크기의 Arial 폰트
+		GetDlgItem(IDC_SERVER_PORT)->SetFont(&m_font); // ID가 IDC_CLIENT_PORT인 컨트롤에 폰트 설정
 
-	CString* pStr = reinterpret_cast<CString*>(lParam);
-	m_client_chat_list.AddString(pStr->GetString());
-	delete pStr; // 동적으로 할당된 CString 객체를 삭제
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		CString str;
+		str.Format(_T("상대편 포트번호 : %s"), pStr->GetString());
+
+		m_serverPort.SetString(str);
+
+		UpdateData(FALSE);
+
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
 	return 0;
 }
 
