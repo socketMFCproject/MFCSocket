@@ -280,6 +280,7 @@ void CServerChat::recivePoint(int x, int y, LPVOID pParam) {
 			CGameover gameover;
 			gameover.SetWinner(!m_dol_state_ ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
 			gameover.DoModal();
+			SendMessage(WM_CLOSE, 0, 0);
 		}
 
 	}
@@ -494,6 +495,8 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 			CGameover gameover;
 			gameover.SetWinner(!m_dol_state ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
 			gameover.DoModal();
+
+			SendMessage(WM_CLOSE, 0, 0);
 		}
 
 

@@ -26,4 +26,5 @@ public:
 	int m_nWinner;
 	void SetWinner(int nWinner) { m_nWinner = nWinner; }
 	CString m_strWinner;
+	afx_msg void OnBnClickedGameoverButton();
 };
