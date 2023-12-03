@@ -5,8 +5,6 @@
 #include "SocketChat_improve.h"
 #include "afxdialogex.h"
 #include "CServerChat.h"
-//#include "Common.h"
-//#include "Dol_Check.h"
 #include <thread>
 #include "CGameover.h"
 
@@ -17,7 +15,6 @@
 #define M_SERVER_RECV_UPDATE (WM_USER + 10) // 서버에서 사용할 사용자 정의 메시지
 // CServerChat 대화 상자
 
-//HANDLE hServerEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 HANDLE hClientEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 
 bool isServerTurn = FALSE;
@@ -180,10 +177,8 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
         if (clientSocket == INVALID_SOCKET) continue;
 		AfxMessageBox(_T("클라이언트 연결 성공"));
 
-        //std::lock_guard<std::mutex> lock(pThis->m_csClientSockets);
         pThis->m_clientSockets.push_back(clientSocket);
 		
-        //AfxBeginThread(ClientThread, (LPVOID)clientSocket);
 		char buf[BUFSIZE+1];
 		int len;
 
@@ -301,28 +296,20 @@ BOOL CServerChat::OnInitDialog()
 
 	// 소켓 생성
 	m_listenSocket = socket(AF_INET, SOCK_STREAM, 0);
-	//if (listen_sock == INVALID_SOCKET) err_quit("socket()");
 
 	// bind()
 	struct sockaddr_in serveraddr;
-
-	
-	
 
 	memset(&serveraddr, 0, sizeof(serveraddr));
 	serveraddr.sin_family = AF_INET;
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serveraddr.sin_port = htons(SERVERPORT);
 	retval = bind(m_listenSocket, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
-	//if (retval == SOCKET_ERROR) err_quit("bind()");
 
-	// listen()
 	retval = listen(m_listenSocket, SOMAXCONN);
-	//if (retval == SOCKET_ERROR) err_quit("listen()");
 
 	AfxBeginThread(AcceptThread, this);
 
-	//SetEvent(hClientEvent);
 	isServerTurn = TRUE;
 	
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -381,26 +368,6 @@ void CServerChat::OnSendPosition(int x, int y) {
 }
 
 
-
-//void CServerChat::SavePosition(int x, int y) {
-//	m_dol[y - 1][x - 1] = m_dol_state + 1;
-//	if (CheckWin(x - 1, y - 1)) {
-//		// 게임 이겼을 경우
-//		//일단 이기면 좌표 창에 우승자 표시
-//		CString winString;
-//		winString = _T("Winner is ");
-//		m_orderList.AddString(winString +(!m_dol_state ? "black" : "white"));
-//
-//		
-//		//게임 종료 화면 띄우기
-//		CGameover gameover;
-//		gameover.SetWinner(!m_dol_state ? 1 : 2); // 흑돌이 이겼으면 1, 백돌이 이겼으면 2
-//		gameover.DoModal();
-//
-//	}
-//	return;
-//}
-//헤더로 뺼 것들 
 bool CServerChat::CheckFive(int x, int y, int dx, int dy, int m_dol_state_) {
 	int count = 0;
 	int dx_ = dx;
@@ -515,46 +482,3 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 }
 
 
-
-//UINT CServerChat::ClientThread(LPVOID pParam)
-//{
-//	CServerChat* pThis = reinterpret_cast<CServerChat*>(pParam);
-//	SOCKET clientSocket = (SOCKET)pParam;
-//	CClientDC dc();
-//	char buf[BUFSIZE];
-//	int len;
-//	pThis->ListInput();
-//	while (true)
-//	{
-//		int retval = recv(clientSocket, (char*)&len, sizeof(int), 0);
-//		if (retval <= 0) break;
-//		if (len >= BUFSIZE) break;
-//
-//		retval = recv(clientSocket, buf, len, 0);
-//		if (retval <= 0) break;
-//		
-//		buf[retval] = '\0';
-//		
-//		//채팅 메시지
-//		// 동적 할당을 사용하지 않고 스택에 CString 객체를 생성
-//		CString str(buf);
-//		AfxMessageBox(_T("클라이언트로 부터 메시지 받기4"));
-//		// 메시지를 UI 스레드로 전달
-//		//pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
-//		pThis->ListInput();
-//		AfxMessageBox(_T("클라이언트로 부터 메시지 받기5"));
-//		
-//		
-//		
-//		
-//	}
-//
-//	// 소켓 닫기s
-//	closesocket(clientSocket);
-//	return 0;
-//}
-
-//void CServerChat::ListInput() {
-//	AfxMessageBox(_T("여기 실행되나?"));
-//	m_chatList.AddString(_T("please"));
-//}

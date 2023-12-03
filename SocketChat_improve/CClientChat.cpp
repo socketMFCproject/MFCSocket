@@ -6,8 +6,6 @@
 #include "SocketChat_improve.h"
 #include "afxdialogex.h"
 #include "CClientChat.h"
-//#include "Dol_Check.h"
-//#include "Common.h"
 #include <thread>
 #include "CGameover.h"
 
@@ -19,7 +17,6 @@ char* SERVERIP = (char*)"127.0.0.1";
 #define M_RECV_UPDATE (WM_USER + 1) // 사용자 정의 메시지
 
 HANDLE hServerEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
-//HANDLE hClientEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 bool isClientTurn = FALSE;
 
 // CClientChat 대화 상자
@@ -38,9 +35,7 @@ CClientChat::CClientChat(CWnd* pParent /*=nullptr*/)
 
 CClientChat::~CClientChat()
 {
-	//if (m_receiveThread.joinable()) {
-	//	m_receiveThread.join();
-	//}
+
 }
 
 void CClientChat::DoDataExchange(CDataExchange* pDX)
@@ -130,7 +125,6 @@ void CClientChat::OnPaint()
 			}
 		}
 		dc.SelectObject(p_old_brush);
-		//CDialogEx::OnPaint();
 	}
 }
 
@@ -280,7 +274,6 @@ BOOL CClientChat::OnInitDialog()
 
 	// 소켓 생성
 	m_sock = socket(AF_INET, SOCK_STREAM, 0);
-	//if (sock == INVALID_SOCKET) err_quit("socket()");
 
 	// connect()
 	struct sockaddr_in serveraddr;
@@ -423,7 +416,6 @@ bool CClientChat::CheckWin(int x, int y, int m_dol_state_) {
 		return true;
 	return false;
 }
-//헤더로 뺄 것들
 
 void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 {
@@ -447,14 +439,6 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 		y *= 40;
 
 		CBrush* p_old_brush;
-		/*if (m_dol_state == 0)
-		{
-			p_old_brush = (CBrush*)dc.SelectStockObject(BLACK_BRUSH);
-		}
-		else
-		{
-			p_old_brush = (CBrush*)dc.SelectStockObject(WHITE_BRUSH);
-		}*/
 		
 		// client는 백돌
 		p_old_brush = (CBrush*)dc.SelectStockObject(WHITE_BRUSH);
@@ -482,7 +466,6 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 		isClientTurn = FALSE;
 	}
 
-	
 
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
