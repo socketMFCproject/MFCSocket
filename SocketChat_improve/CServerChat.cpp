@@ -231,7 +231,7 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 				int y = buf[2];
 				pThis->recivePoint(x, y, pParam);
 				CString str;
-				str.Format(_T("x : %d y: %d"), x, y);
+				str.Format(_T("x : %2d y : %2d         white"), x, y);
 				pThis->PostMessage(M_SERVER_RECV_UPDATE, 2, (LPARAM)new CString(str));
 
 
@@ -242,9 +242,6 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 				pThis->PostMessage(M_SERVER_RECV_UPDATE, 1, (LPARAM)new CString(str));
 				
 			}
-
-		
-			
 		}
 
 		// 소켓 닫기s
@@ -507,10 +504,10 @@ void CServerChat::OnLButtonDown(UINT nFlags, CPoint point)
 
 		
 		CString str;
-		str.Format(_T("x : %d y : %d"), x / 40, y / 40);
+		str.Format(_T("x : %2d y : %2d"), x / 40, y / 40);
 		
 
-		m_orderList.AddString(str + " turn : " + "black");
+		m_orderList.AddString(str + " black");
 		isServerTurn = FALSE;
 	}
 	

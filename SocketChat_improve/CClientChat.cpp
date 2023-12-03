@@ -186,7 +186,7 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 
 			//TODO: 이 x y 좌표로 그리기
 			CString test;
-			test.Format(_T("x : %d, y : %d"), x, y);
+			test.Format(_T("x : %2d y : %2d         black"), x, y);
 			pThis->PostMessageW(M_RECV_UPDATE, 2, (LPARAM)new CString(test));
 		}
 		else if (buf[0] == 3) {
@@ -476,9 +476,9 @@ void CClientChat::OnLButtonDown(UINT nFlags, CPoint point)
 		}
 
 		CString str;
-		str.Format(_T("x : %d y : %d"), x / 40, y / 40);
+		str.Format(_T("x : %2d y : %2d"), x / 40, y / 40);
 
-		m_orderList.AddString(str + " turn : " + "white");
+		m_orderList.AddString(str + " white");
 		isClientTurn = FALSE;
 	}
 

@@ -1,1 +1,3 @@
-﻿  SocketChat_improve.vcxproj -> C:\Users\rlawo\Desktop\MFC\MFCSocket\SocketChat_improve\x64\Debug\SocketChat_improve.exe
+﻿  CServerChat.cpp
+C:\Users\rlawo\Desktop\MFC\MFCSocket\SocketChat_improve\CServerChat.cpp(300,44): warning C4390: ';': 제어된 빈 문이 있습니다. 이 문이 필요합니까?
+  SocketChat_improve.vcxproj -> C:\Users\rlawo\Desktop\MFC\MFCSocket\SocketChat_improve\x64\Debug\SocketChat_improve.exe
