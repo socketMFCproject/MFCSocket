@@ -157,6 +157,11 @@ LRESULT CServerChat::OnUpdateServerChat(WPARAM wParam, LPARAM lParam) {
 
 		delete pStr; // 동적으로 할당된 CString 객체를 삭제
 	}
+	else if (wParam == 2) {
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		m_orderList.AddString(pStr->GetString());
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
 	
 	return 0;
 }
@@ -227,7 +232,7 @@ UINT CServerChat::AcceptThread(LPVOID pParam)
 				pThis->recivePoint(x, y, pParam);
 				CString str;
 				str.Format(_T("x : %d y: %d"), x, y);
-				pThis->PostMessage(M_SERVER_RECV_UPDATE, 0, (LPARAM)new CString(str));
+				pThis->PostMessage(M_SERVER_RECV_UPDATE, 2, (LPARAM)new CString(str));
 
 
 			}

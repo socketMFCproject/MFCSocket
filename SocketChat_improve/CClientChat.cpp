@@ -187,7 +187,7 @@ UINT CClientChat::ClientOwnThread(LPVOID aParam)
 			//TODO: 이 x y 좌표로 그리기
 			CString test;
 			test.Format(_T("x : %d, y : %d"), x, y);
-			pThis->PostMessageW(M_RECV_UPDATE, 0, (LPARAM)new CString(test));
+			pThis->PostMessageW(M_RECV_UPDATE, 2, (LPARAM)new CString(test));
 		}
 		else if (buf[0] == 3) {
 			//상대방 포트 번호 받기
@@ -257,6 +257,11 @@ LRESULT CClientChat::OnUpdateListbox(WPARAM wParam, LPARAM lParam) {
 
 		UpdateData(FALSE);
 
+		delete pStr; // 동적으로 할당된 CString 객체를 삭제
+	}
+	else if (wParam == 2) {
+		CString* pStr = reinterpret_cast<CString*>(lParam);
+		m_orderList.AddString(pStr->GetString());
 		delete pStr; // 동적으로 할당된 CString 객체를 삭제
 	}
 	return 0;
