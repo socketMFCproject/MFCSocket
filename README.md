@@ -9,10 +9,11 @@
 <p align="justify">
 프로젝트 개요 : TCP socket 통신을 통한 온라인 멀티 오목게임
 </p>
-
 <p align="center">
-추후 시연 이미지 삽입 예정
-GIF Images
+  추후 이미지 삽입 예정
+</p>
+<p align="center">
+  GIF Images
 </p>
 
 <br>
