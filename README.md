@@ -9,14 +9,18 @@
 <p align="justify">
 프로젝트 개요 : TCP socket 통신을 통한 온라인 멀티 오목게임
 </p>
-<p align="center">
-  추후 이미지 삽입 예정
-</p>
-<p align="center">
-  GIF Images
-</p>
+
+### 클라이언트 ui
+![image](https://github.com/socketMFCproject/MFCSocket/assets/55120730/7824c635-5d9a-4b00-8afe-e014be4cafe1)
+
+### 서버 ui
+![image](https://github.com/socketMFCproject/MFCSocket/assets/55120730/1aa3c10b-a4ee-43ae-995c-c2a3ddf5d8a3)
 
 <br>
+
+## 구조도
+![image](https://github.com/socketMFCproject/MFCSocket/assets/55120730/cb7d606a-1970-48e6-a653-33364f99fb03)
+
 
 ## 기술 스택
 <img src="https://img.shields.io/badge/c++-00599C?style=for-the-badge&logo=c%2B%2B&logoColor=white">
